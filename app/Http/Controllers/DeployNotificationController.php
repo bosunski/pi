@@ -4,12 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Contracts\AMQPConnectionInterface;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use PhpAmqpLib\Message\AMQPMessage;
 
 class DeployNotificationController extends Controller
 {
     public function notify(Request $request)
     {
+        Log::info(json_encode($request->all()));
         $amqpConnection = app()->make(AMQPConnectionInterface::class);
         $channel = $amqpConnection->channel();
         $channel->queue_declare('travisStatus', false, false, false, false);

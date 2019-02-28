@@ -11,13 +11,19 @@ class DeployNotificationController extends Controller
 {
     public function notify(Request $request)
     {
-        Log::info(json_encode($request->payload['state']));
+        $payload = json_decode($request->payload);
+
+        Log::info($payload->state);
         $amqpConnection = app()->make(AMQPConnectionInterface::class);
         $channel = $amqpConnection->channel();
         $channel->queue_declare('travisStatus', false, false, false, false);
 
-        $msg = new AMQPMessage($request->payload->state);
+        $msg = new AMQPMessage($payload->state);
+
+//        for($i = 0; $i < 100; $i++) {
         $channel->basic_publish($msg, '', 'travisStatus');
+//            sleep(1);
+//        }
 
         return $request->all();
     }
